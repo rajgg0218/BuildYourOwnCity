@@ -7,7 +7,10 @@ This README records everything that was built and changed on **7 October 2026**.
 
 | File | What it is |
 |---|---|
-| `pocketopolis-v3.4.html` (same as `pocketopolis.html`) | **Current build (v3.4).** Admin-only test build. Admins start with every item unlocked and infinite money (switchable in settings), and buying land is easier and clearer. |
+| `pocketopolis-v3.7.html` (same as `pocketopolis.html`) | **Current build (v3.7).** Admin-only test build with a more realistic look (High graphics) and a Graphics quality setting. |
+| `pocketopolis-v3.6.html` | v3.6: connected-but-empty zones say why (paused, no demand, waiting). Superseded by v3.7. |
+| `pocketopolis-v3.5.html` | v3.5: zones easier to see, with missing road/power/water icons. Superseded by v3.6. |
+| `pocketopolis-v3.4.html` | v3.4: easier, clearer land buying. Superseded by v3.5. |
 | `pocketopolis-v3.3.html` | v3.3: admin access settings. Superseded by v3.4. |
 | `pocketopolis-v3.2.html` | v3.2: version 3 land, money and rent, with every building unlocked for admins. Superseded by v3.3. |
 | `pocketopolis-v3.1.html` | v3.1: admin full access (every lot open, unlimited money). Superseded by v3.2. |
@@ -18,7 +21,7 @@ This README records everything that was built and changed on **7 October 2026**.
 
 All game files are self-contained: open them in a modern browser. The only outside request is the Google font, which falls back to a system font if it cannot load.
 
-The current build (v3.4) is also published as a private page at https://claude.ai/artifact/37piMfGjMUDhTabYYPMWY7 (visible only to its owner unless shared).
+The current build (v3.7) is also published as a private page at https://claude.ai/artifact/37piMfGjMUDhTabYYPMWY7 (visible only to its owner unless shared).
 
 ## Version history (7 Oct 2026)
 
@@ -157,6 +160,55 @@ I could not reproduce a failure: in a simulated browser, a mouse click and a tou
 - **"Every lot open" message:** if that switch is on, buying now explains that every lot is already open and where to switch it off (before, the message was easy to miss and looked like buying was broken).
 - **"Enable everything" is now "Enable items & money".** It no longer turns on "Every lot open", so the for-sale lots stay in place. Open every lot remains its own switch.
 - Testing: a headless run checked real clicks and taps (mouse buy, touch buy, inspector button, button disappears after buying, clearer message on a build tool, the open-every-lot message, the changed preset) and all passed with no script errors.
+
+### v3.5: zones and buildings are easier to see
+Raised by the project owner: *"The zone tab, like the building are not showing up in the map."*
+
+I could not reproduce a total failure. In a simulated browser, dragging a road, power, water and zones with real clicks made buildings grow within about 12 seconds, and a browser-strict canvas raised no drawing errors. But the test showed several ways it can look like nothing is happening, so this version fixes them:
+- **Zones are much more visible:** stronger Residential (green), Commercial (blue) and Industrial (yellow) colours, a thicker outline and an **R / C / I** letter on every empty zone tile. Before, the green zone tint was close to the grass colour.
+- **The map now says what a zone is waiting for:** a small icon on each empty zone shows 🛣️ no road within 2 tiles, ⚡ no power, or 💧 no water.
+- **Power or water that is not touching a road is flagged** with a 🛣️ icon. In my own test the power and water were three tiles from the road, so nothing grew, which is an easy mistake to make.
+- **First-time hint:** the first time you zone without a road, power or water, a message explains that zones only turn into buildings beside a road with power and water.
+- **Closer starting view:** the camera starts framed tighter on your land (about 96% instead of 67% in the test), so buildings are not tiny.
+- **Safer drawing:** if one item ever fails to draw, the rest of the map still draws, and a message tells you to check the browser console. Before, an error could have stopped the whole picture.
+- Help text now explains zones and the icons.
+- Testing: a headless run with real clicks checked the road, zones, hint, empty-zone icons, flagged power and water, and growth into buildings once connected. All passed with no script errors.
+
+If zones still look empty for you, the most likely reasons are no road within 2 tiles, no power or water connected to the road, the game paused, or the browser tab in the background.
+
+### v3.6: a zone that is connected but empty now says why
+Raised by the project owner, with a screenshot: an L-shaped road, a wind turbine, a water tower and one Commercial zone beside the road, still empty. *"Why is it still like this?"*
+
+The screenshot showed no ⚡ 💧 🛣️ icon, so the game considered the zone connected to a road with power and water. I rebuilt that exact scene: the zone built in about 4 seconds on average (about 18 seconds in the slowest of 30 trials), so I could not reproduce a stuck zone. A connected zone can still stay empty for three reasons that the map did not show:
+- **The game is paused** (for example, Space was pressed).
+- **There is no demand yet** for that zone type (the R / C / I bars show demand).
+- **Builders have not arrived yet:** each zone tile has a small random chance to start building every tick.
+
+So this version shows the reason on the map:
+- ⏳ on an empty connected zone: everything is connected and builders are coming.
+- 📉: there is no demand for that zone type yet.
+- ⏸️: the game is paused.
+- A **"Paused" banner** at the top of the map. Click it (or press Space) to resume.
+- Help text explains all the icons.
+- Testing: a headless run checked the paused banner and icon, resuming from the banner, the no-demand icon, the waiting icon, the no-road icon, and that a built zone loses its icon. All passed with no script errors.
+
+If a zone still looks stuck, look at the icon on the zone and the R / C / I demand bars (top left of the map).
+
+### v3.7: a more realistic look (High graphics)
+Requested: *"Can you make the map more realistic looking?"*
+
+The game is still a 2D isometric picture, so this is realism within that style. New **High graphics** (the default) adds:
+- **Seamless, textured ground.** All natural ground and water is now drawn as merged shapes with a grass texture across the whole land, so the visible tile seams are gone. Parks get the same texture.
+- **Living water.** Water has moving ripples in two directions, sun glitter that depends on the real sun and cloud, and a reflection of the current sky colour (orange at sunset), plus the existing shoreline foam.
+- **Lighting that follows the sun.** The two visible sides of every building are lit differently through the day (the left side is brighter in the morning, the right in the evening), and flatter at night and under cloud.
+- **Sky reflected in the glass.** Windows take on the colour of the sky: blue at midday, warm at sunset, grey when overcast.
+- **Softer, more natural shadows** with soft edges, and a contact shadow where buildings meet the ground.
+- **Better building shading:** edge highlights, edge shade lines on corners, and shingle courses on roofs when zoomed in.
+- **Fuller trees:** shaded canopies with highlights.
+- **Depth haze:** the far (upper) part of the land is slightly softer and bluer.
+- **Smarter map icons:** the status bubbles stay small when you zoom in.
+- **Graphics quality setting** in the menu: High (realistic) or Standard (the previous look, faster). It is remembered on the device. If a device runs High slowly for a while, the game switches itself to Standard and tells you; choosing High again in the menu turns that automatic switch off.
+- Testing: a headless run rendered a developed town in High and Standard at noon, golden hour, night, rain and autumn, and zoomed in close, on a canvas that throws the same errors as a real browser. Everything rendered with no errors, and the menu setting switched back and forth and was saved. In that slow software test, High took about 30% longer per frame than Standard. That is not a real graphics chip, so actual speed will differ. I checked the pictures at noon, golden hour and in a close-up, and fixed two problems found along the way (shadows that were far too dark, and oversized status bubbles when zoomed in).
 
 ## Controls
 
