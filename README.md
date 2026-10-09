@@ -7,7 +7,13 @@ This README records everything that was built and changed on **7 October 2026**.
 
 | File | What it is |
 |---|---|
-| `pocketopolis-v3.4.html` (same as `pocketopolis.html`) | **Current build (v3.4).** Admin-only test build. Admins start with every item unlocked and infinite money (switchable in settings), and buying land is easier and clearer. |
+| `pocketopolis-v3.9.1.html` (same as `pocketopolis.html`) | **Current build (v3.9.1).** Fixes houses (and factories) being demolished and rebuilt over and over. |
+| `pocketopolis-v3.9.html` | v3.9: phone-friendly layouts and safer saving. Superseded by v3.9.1. |
+| `pocketopolis-v3.8.html` | v3.8: scrollable dock, 10 kinds of zone, cute sounds and music. Superseded by v3.9. |
+| `pocketopolis-v3.7.html` | v3.7: more realistic look (High graphics). Superseded by v3.8. |
+| `pocketopolis-v3.6.html` | v3.6: connected-but-empty zones say why (paused, no demand, waiting). Superseded by v3.7. |
+| `pocketopolis-v3.5.html` | v3.5: zones easier to see, with missing road/power/water icons. Superseded by v3.6. |
+| `pocketopolis-v3.4.html` | v3.4: easier, clearer land buying. Superseded by v3.5. |
 | `pocketopolis-v3.3.html` | v3.3: admin access settings. Superseded by v3.4. |
 | `pocketopolis-v3.2.html` | v3.2: version 3 land, money and rent, with every building unlocked for admins. Superseded by v3.3. |
 | `pocketopolis-v3.1.html` | v3.1: admin full access (every lot open, unlimited money). Superseded by v3.2. |
@@ -18,7 +24,7 @@ This README records everything that was built and changed on **7 October 2026**.
 
 All game files are self-contained: open them in a modern browser. The only outside request is the Google font, which falls back to a system font if it cannot load.
 
-The current build (v3.4) is also published as a private page at https://claude.ai/artifact/37piMfGjMUDhTabYYPMWY7 (visible only to its owner unless shared).
+The current build (v3.9.1) is also published as a private page at https://claude.ai/artifact/37piMfGjMUDhTabYYPMWY7 (visible only to its owner unless shared).
 
 ## Version history (7 Oct 2026)
 
@@ -158,6 +164,119 @@ I could not reproduce a failure: in a simulated browser, a mouse click and a tou
 - **"Enable everything" is now "Enable items & money".** It no longer turns on "Every lot open", so the for-sale lots stay in place. Open every lot remains its own switch.
 - Testing: a headless run checked real clicks and taps (mouse buy, touch buy, inspector button, button disappears after buying, clearer message on a build tool, the open-every-lot message, the changed preset) and all passed with no script errors.
 
+### v3.5: zones and buildings are easier to see
+Raised by the project owner: *"The zone tab, like the building are not showing up in the map."*
+
+I could not reproduce a total failure. In a simulated browser, dragging a road, power, water and zones with real clicks made buildings grow within about 12 seconds, and a browser-strict canvas raised no drawing errors. But the test showed several ways it can look like nothing is happening, so this version fixes them:
+- **Zones are much more visible:** stronger Residential (green), Commercial (blue) and Industrial (yellow) colours, a thicker outline and an **R / C / I** letter on every empty zone tile. Before, the green zone tint was close to the grass colour.
+- **The map now says what a zone is waiting for:** a small icon on each empty zone shows 🛣️ no road within 2 tiles, ⚡ no power, or 💧 no water.
+- **Power or water that is not touching a road is flagged** with a 🛣️ icon. In my own test the power and water were three tiles from the road, so nothing grew, which is an easy mistake to make.
+- **First-time hint:** the first time you zone without a road, power or water, a message explains that zones only turn into buildings beside a road with power and water.
+- **Closer starting view:** the camera starts framed tighter on your land (about 96% instead of 67% in the test), so buildings are not tiny.
+- **Safer drawing:** if one item ever fails to draw, the rest of the map still draws, and a message tells you to check the browser console. Before, an error could have stopped the whole picture.
+- Help text now explains zones and the icons.
+- Testing: a headless run with real clicks checked the road, zones, hint, empty-zone icons, flagged power and water, and growth into buildings once connected. All passed with no script errors.
+
+If zones still look empty for you, the most likely reasons are no road within 2 tiles, no power or water connected to the road, the game paused, or the browser tab in the background.
+
+### v3.6: a zone that is connected but empty now says why
+Raised by the project owner, with a screenshot: an L-shaped road, a wind turbine, a water tower and one Commercial zone beside the road, still empty. *"Why is it still like this?"*
+
+The screenshot showed no ⚡ 💧 🛣️ icon, so the game considered the zone connected to a road with power and water. I rebuilt that exact scene: the zone built in about 4 seconds on average (about 18 seconds in the slowest of 30 trials), so I could not reproduce a stuck zone. A connected zone can still stay empty for three reasons that the map did not show:
+- **The game is paused** (for example, Space was pressed).
+- **There is no demand yet** for that zone type (the R / C / I bars show demand).
+- **Builders have not arrived yet:** each zone tile has a small random chance to start building every tick.
+
+So this version shows the reason on the map:
+- ⏳ on an empty connected zone: everything is connected and builders are coming.
+- 📉: there is no demand for that zone type yet.
+- ⏸️: the game is paused.
+- A **"Paused" banner** at the top of the map. Click it (or press Space) to resume.
+- Help text explains all the icons.
+- Testing: a headless run checked the paused banner and icon, resuming from the banner, the no-demand icon, the waiting icon, the no-road icon, and that a built zone loses its icon. All passed with no script errors.
+
+If a zone still looks stuck, look at the icon on the zone and the R / C / I demand bars (top left of the map).
+
+### v3.7: a more realistic look (High graphics)
+Requested: *"Can you make the map more realistic looking?"*
+
+The game is still a 2D isometric picture, so this is realism within that style. New **High graphics** (the default) adds:
+- **Seamless, textured ground.** All natural ground and water is now drawn as merged shapes with a grass texture across the whole land, so the visible tile seams are gone. Parks get the same texture.
+- **Living water.** Water has moving ripples in two directions, sun glitter that depends on the real sun and cloud, and a reflection of the current sky colour (orange at sunset), plus the existing shoreline foam.
+- **Lighting that follows the sun.** The two visible sides of every building are lit differently through the day (the left side is brighter in the morning, the right in the evening), and flatter at night and under cloud.
+- **Sky reflected in the glass.** Windows take on the colour of the sky: blue at midday, warm at sunset, grey when overcast.
+- **Softer, more natural shadows** with soft edges, and a contact shadow where buildings meet the ground.
+- **Better building shading:** edge highlights, edge shade lines on corners, and shingle courses on roofs when zoomed in.
+- **Fuller trees:** shaded canopies with highlights.
+- **Depth haze:** the far (upper) part of the land is slightly softer and bluer.
+- **Smarter map icons:** the status bubbles stay small when you zoom in.
+- **Graphics quality setting** in the menu: High (realistic) or Standard (the previous look, faster). It is remembered on the device. If a device runs High slowly for a while, the game switches itself to Standard and tells you; choosing High again in the menu turns that automatic switch off.
+- Testing: a headless run rendered a developed town in High and Standard at noon, golden hour, night, rain and autumn, and zoomed in close, on a canvas that throws the same errors as a real browser. Everything rendered with no errors, and the menu setting switched back and forth and was saved. In that slow software test, High took about 30% longer per frame than Standard. That is not a real graphics chip, so actual speed will differ. I checked the pictures at noon, golden hour and in a close-up, and fixed two problems found along the way (shadows that were far too dark, and oversized status bubbles when zoomed in).
+
+### v3.8: scrollable categories, more buildings in Zones, cute sounds
+Requested for v3.7: the categories are not adjustable or scrollable; add more buildings in Zones; add some cute sounds to make the game enjoyable.
+
+**Scrollable, adjustable categories and tools**
+- The category tabs and the tool row now scroll sideways with the **mouse wheel**, by **dragging** with the mouse, with **‹ ›** arrow buttons that appear when there is more to see, and with a thin visible scrollbar. Touch screens scroll by swiping as before. A click that ends a drag is ignored, so dragging never picks a tool by accident.
+- The selected category scrolls into the middle of the strip.
+- **All tools ▴ / Collapse ▾** button: opens a bigger tray where every category and every tool wraps into a grid (scrolls up and down if needed). The choice is remembered on the device.
+
+**More buildings in Zones: 10 kinds instead of 3**
+Zones still grow into buildings by themselves (3 levels each). The Zones tab now has:
+- **Residential:** Houses, **Apartments** (about 1.7 times the residents and more rent, but needs higher land value), **Eco homes** (green roofs and solar panels, half the power use, a small park-like lift).
+- **Commercial:** Shops, **Offices** (more jobs and rent, needs higher land value), **Resort strip** (boutique hotels, pools and palms; strong rent plus tourism income; thirsty).
+- **Industrial:** Factories, **Light industry** (sawtooth sheds, about a quarter of the smoke), **Farmland** (fields, barns, silos and greenhouses; no smoke, very thirsty, fewer jobs), **Tech park** (clean, high-paying; **needs a school, library or university nearby**, and shows a 🎓 icon until it has one).
+- Each empty zone shows a letter for its kind (R, A, E, C, O, V, I, L, F, T). The inspector names the kind. Variants save and load with your city. Costs and unlock populations are in the tool tooltips; admins have everything unlocked.
+
+**Cute sounds and music** (all generated in the browser, no sound files)
+- **Effects:** a soft pop on selecting a tool, a tick on tabs, a rising pentatonic note for each tile as you paint zones (so dragging plays a little tune), different happy sounds for roads, utilities, services, parks and decorations, civic and landmark buildings, a "bwoop" for bulldozing, splashes when digging water, a gentle "uh-oh" for errors, a wind-chime ding whenever a building finishes construction, coin chimes when rent comes in, a fanfare when you buy land or reach a new town size, and an owl hoot when you tap Hoot the advisor.
+- **Nature:** birdsong by day, crickets at night, a soft rain bed when it rains, and distant thunder in heavy rain.
+- **Music:** a gentle generative music-box tune, brighter by day and slower and softer at night.
+- **Menu:** Sound effects (On/Off), Music (On/Off) and Volume (Low/Medium/High). Choices are remembered on the device. Sound pauses when the browser tab is in the background.
+- Browsers only allow sound after you have clicked or pressed a key, so everything starts after sign-in.
+- Testing: a headless run with a strict mock of the browser's audio engine (it rejects the same invalid values Chrome does) played all 22 effects, the music scheduler and the ambience with no errors, and checked that Music and Sound effects switch off and on independently and are remembered. I could not listen to the sounds, so how they sound to you is untested. Also tested: dock wheel, drag, arrows and expand tray; all 10 zone kinds at all 3 levels rendered with no drawing errors; the rules for the new kinds (apartments hold more residents, eco homes lift nearby land, a tech park refuses to build without education coverage and builds once a school is nearby); and variants surviving save and load. Earlier test suites (graphics, zone icons, admin access, buying land) were rerun and still pass.
+
+### v3.9: phone-friendly layouts and safer saving
+Raised by the project owner: *"Is the web responsive already?"* and *"Does this game have a save option? Will the whole town be saved?"*
+
+**Responsive: what I found, then fixed**
+I tested the real game in a real Chromium browser at six sizes (360x640 and 390x844 phones, an 844x390 phone on its side, an 820x1180 tablet, a 1366x768 laptop and a 1920x1080 screen), signing in and measuring. In v3.8 nothing overflowed sideways and nothing fell off the screen, and there were no browser errors, but phones were cramped:
+- on a phone on its side the map got only 125 px of a 390 px screen, the advisor card covered the zoom buttons and the login card was taller than the screen;
+- on phones in portrait the top bar wrapped to three rows (130 px), the advisor card overlapped the demand bars, the starting zoom was 34%, and the expanded tool tray left only about 130 px of map on the smallest phone;
+- many touch targets were smaller than the usual 44 px (category tabs 30 px, scroll arrows 28 px).
+
+Fixes in v3.9:
+- **Phones in portrait:** a compact two-row top bar (about 102 px), no overlapping cards, a closer starting view, and a shorter expanded tray with scrollable categories.
+- **Phones on their side:** the tools move into a **side rail** (compact category buttons and a one-column tool list), so the map keeps its height (342 px instead of 125 px). The login card scrolls if the screen is short. Screen notches are respected.
+- **Advisor card:** shows two lines on phones; tap it to read the whole message.
+- **Touch screens:** bigger buttons, tabs, arrows and zoom controls.
+- Retested at all six sizes: no overlaps, no sideways overflow, nothing off screen, no browser errors. A few small items remain by design: category tabs in the landscape side rail are 28 px tall (a trade-off for space), and desktop tabs stay 30 px because a mouse does not need more. Tablets in portrait use a two-row top bar. This was tested in a desktop browser with phone sizes and touch emulation, not on real phones or iPhone Safari.
+
+**Saving: yes, there is a save, and it covers the whole town**
+Tested in a real browser across a page reload. These are saved and restored exactly: the terrain you reshaped (dug water and added land), every road, zone (including its kind), building, decoration, tree, the lots you own, tax rate, money, city name, date, population milestones and history, your time zone, and the random map itself. What is not saved, by design: things in progress (a building mid-construction finishes on load, a fire is out), traffic, boats, people, weather and the camera position.
+Gaps found and fixed:
+- After reopening the page you used to get a new random city until you pressed Load. Now the game **offers to continue your saved city** ("Welcome back, Mayor"), paused until you choose.
+- The only autosave used to be once per in-game year, into the same slot as your own save. Now there are **two slots**: **Your save** (the menu's Save city) and **Autosave** (every minute and when you leave or switch tabs). An autosave never overwrites Your save, and it stays off until you choose to continue, load or start a new city, so a fresh empty city cannot replace your autosave by accident.
+- **Load city** now opens a picker showing both slots with city name, population and how long ago. The menu shows when you last saved.
+- Saves live in your browser on this device (local storage). They are not in the cloud, so clearing your browser data, using a private window, or switching browser or device means the saves are not there. The admin tools can export and import a save as text if you want to move a town or keep a backup.
+- Testing: real-browser checks of autosave on leaving, the continue prompt, the game staying paused while it is open, the overwrite guard, Continue restoring the town, manual save and the last-saved label, the load picker, loading each slot, closing the prompt without choosing, and Start a new city. All passed with no browser errors. The earlier test suites (dock, zones, sound, buying land, admin access, zone icons, graphics) were rerun and still pass.
+
+### v3.9.1: houses no longer keep rebuilding (bug fix)
+Reported by the project owner: *"I saw a bug: the houses keep rebuilding once I put them on the land."*
+
+**Reproduced.** In the simulation, 32 house tiles beside a road with power and water saw 78 houses built from nothing and 71 knocked down in about 7 minutes of play, so only around 7 stood at any moment. In a bigger mixed town it was far worse (3,209 builds and 3,179 demolitions on 90 tiles in 3,000 ticks, one tile rebuilt 60 times). The problem had been in the game since the first version.
+
+**Causes found, and fixed**
+1. **Unhappy homes-only towns.** A new town with houses but no jobs settled at happiness around 19, and the game demolished homes whenever happiness was below 28. Now people only leave when happiness is below 14, and the unemployment penalty scales with town size, so a young town is no longer miserable.
+2. **Demand jumped.** When population dipped under 30, demand for homes jumped from "none" to "strong", so more houses were zoned and built, then demolished again. Demand now fades smoothly as the town grows.
+3. **Factories were demolished by each other's smoke.** In a dense industrial block, each factory's land value was dragged down by its neighbours' pollution, so it was demolished, the smoke cleared, and a new factory was built. Industry is no longer penalised by pollution.
+4. **Too quick to give up on a power or water dip.** Buildings now lose power or water for about 11 seconds before they can be downgraded, so the evening power peak no longer causes churn. Buildings also need slightly better land value to be built than to be demolished (a gap, so they do not flip back and forth).
+5. **Upgrades looked like rebuilding.** Upgrading a building used to replace it with a fenced construction site, and its residents or jobs vanished for a while. Now the existing building stays standing and occupied, with a crane beside it. Only brand-new buildings get the fenced site.
+
+**Small balance changes that come with this:** plain land is a little more valuable (about 41 instead of 36), baseline crime is a little lower, and a homes-only town stops growing at roughly 60 residents until you add shops or factories (the advisor suggests this). Homes and shops built right next to heavy industry can still be lost when the smoke makes the land worthless (this is intended), and the tile then stays empty until the land recovers. A new **⛔ icon** on empty zones explains this: the land value is too low (smoke or crime nearby).
+
+**Testing after the fix:** the same 32-house test: each house built once, none demolished. The larger mixed town on identical land: stable at 61 buildings from tick 500 to tick 3,000, no tile rebuilt more than once. A deliberate power shortage at the evening peak: no endless loops, no tile rebuilt more than twice. The upgrade look was checked in a real browser. All earlier test suites (dock, zones, sound, buying land, admin access, zone icons, graphics, save and continue) were rerun and still pass.
+
 ## Controls
 
 - Drag to paint roads, zones, parks and some decorations; click to place everything else.
@@ -169,7 +288,7 @@ I could not reproduce a failure: in a simulated browser, a mouse click and a tou
 - The passcode gate is not real security (see above).
 - Testing was done headless (a simulated browser). It has not been tried with a real mouse, touch screen, or on a phone.
 - Solar farms can cause blackouts at night by design; pair them with wind, gas or coal.
-- Saves live in the browser's own storage, so they are per browser and per device.
+- Saves live in the browser's own storage, so they are per browser and per device. Clearing site data or using a private window loses them; use Admin tools > Export save for a backup.
 - Economy balance (rent, lot prices, land tax) is my own estimate and has not been play-tested over a long game.
 - Land beyond your lots is hidden until it is next to your land, unless you switch on Open every lot in Admin tools.
 - The Admin tools menu entry and button are available to anyone who gets past the passcode.
